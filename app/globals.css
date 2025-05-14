@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
+  --heading: #111827;
+  --number-color: #111827;
+  --purple-primary: #8b5cf6;
+  --purple-light: #f5f3ff;
+  --purple-dark: #6d28d9;
+  --orange-light: #ffedd5;
+  --red-light: #fee2e2;
+  --card-bg-light: #f9fafb;
+  --input-bg-light: #f3f4f6;
+  --border-light: #e5e7eb;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --icon-color: #4b5563;
+  --progress-bg: #e5e7eb;
+  --progress-fill: #8b5cf6;
+}
+
+.dark {
+  --background: #121212;
+  --foreground: #f5f5f5;
+  --text-primary: #f3f4f6;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  --heading: #ffffff;
+  --number-color: #ffffff;
+  --purple-primary: #c4b5fd;
+  --purple-light: #2e1065;
+  --purple-dark: #d8b4fe;
+  --orange-light: #451a03;
+  --red-light: #450a0a;
+  --card-bg-light: #1e1e1e;
+  --input-bg-light: #2d2d2d;
+  --border-light: #333333;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --icon-color: #e5e7eb;
+  --progress-bg: #374151;
+  --progress-fill: #c4b5fd;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Improved focus styles for better accessibility */
+:focus-visible {
+  outline: 2px solid var(--purple-primary);
+  outline-offset: 2px;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--heading);
+}
+
+p {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-tertiary {
+  color: var(--text-tertiary);
+}
+
+svg {
+  color: var(--icon-color);
+}
+
+/* Ensure high contrast for inputs in dark mode */
+.dark input,
+.dark textarea {
+  color-scheme: dark;
+}
+
+/* Keyboard navigation styles */
+.keyboard-focus *:focus {
+  outline: 2px solid var(--purple-primary);
+  outline-offset: 2px;
+}
