@@ -104,7 +104,6 @@ export default function FileUpload({
         } rounded-md cursor-pointer transition-colors bg-white/10`}
         role="button"
         tabIndex={0}
-        aria-invalid={error ? 'true' : 'false'}
         aria-describedby={error ? `${id}-error` : `${id}-description`}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {

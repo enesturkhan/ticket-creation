@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
 
 export default function Home() {
   const [text, setText] = useState("");
@@ -140,7 +139,7 @@ export default function Home() {
 
     window.addEventListener('keydown', handleKeyboardShortcuts);
     return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
-  }, []);
+  }, [toggleTheme]);
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)]">
