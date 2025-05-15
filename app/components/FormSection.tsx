@@ -209,7 +209,7 @@ export default function FormSection() {
           {...register('github')}
         />
 
-        <InputFieldd
+        <InputField
           id="profession"
           label="Mesleğiniz"
           type="text"
