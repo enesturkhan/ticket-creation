@@ -4,6 +4,6 @@ const nextConfig = {
   images: {
     domains: ['api.qrserver.com'],
   },
-/** @type {import('next').NextConfig} */
+};
 
 export default nextConfig;

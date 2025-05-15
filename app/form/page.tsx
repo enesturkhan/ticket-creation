@@ -1,11 +1,8 @@
+"use client";
+
 import React from 'react';
 import FormSection from '../components/FormSection';
 import Header from '../components/Header';
-
-export const metadata = {
-  title: 'CodeFusion 2025 - Kayit Formu',
-  description: 'Yazilim dunyasinin en buyuk konferansi icin kayit formunu doldurun.',
-};
 
 export default function FormPage() {
   return (

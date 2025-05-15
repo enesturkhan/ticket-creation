@@ -64,6 +64,12 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
   const handleDownloadPdf = async () => {
     if (!ticketRef.current) return;
     
+    // Make sure we're in a browser environment
+    if (typeof window === 'undefined') {
+      console.error('PDF generation can only be performed in a browser environment');
+      return;
+    }
+    
     setDownloadingPdf(true);
     
     try {
@@ -106,6 +112,12 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
 
   // Sosyal medyada paylasma fonksiyonu
   const handleShare = async () => {
+    // Make sure we're in a browser environment
+    if (typeof window === 'undefined' || !navigator) {
+      console.error('Sharing can only be performed in a browser environment');
+      return;
+    }
+    
     if (navigator.share) {
       try {
         await navigator.share({
