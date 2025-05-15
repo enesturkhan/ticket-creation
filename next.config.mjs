@@ -5,7 +5,6 @@ const nextConfig = {
     domains: ['api.qrserver.com'],
   },
   reactStrictMode: true,
-  swcMinify: true,
 };
 
 export default nextConfig;

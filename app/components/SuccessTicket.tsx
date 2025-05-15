@@ -3,8 +3,7 @@
 import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-// @ts-expect-error - html2pdf.js icin tip tanimi yok
-import html2pdf from 'html2pdf.js';
+// We'll dynamically import html2pdf.js on the client side only
 
 // Bilet icin verilerimizin tipini tanimliyoruz
 interface TicketData {
@@ -62,41 +61,44 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
   };
   
   // PDF olarak indirme
-  const handleDownloadPdf = () => {
+  const handleDownloadPdf = async () => {
     if (!ticketRef.current) return;
     
     setDownloadingPdf(true);
     
-    const element = ticketRef.current;
-    const opt = {
-      margin: 10,
-      filename: `CodeFusion2025-Bilet-${data.id}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2,
-        useCORS: true,
-        logging: true 
-      },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait' 
-      }
-    };
-    
-    // Daha saglam bir PDF olusturma yaklasimi
-    const worker = html2pdf().from(element).set(opt);
-    
-    worker.save()
-      .then(() => {
-        console.log('PDF basariyla olusturuldu');
-        setDownloadingPdf(false);
-      })
-      .catch((error: Error) => {
-        console.error('PDF olusturma hatasi:', error);
-        setDownloadingPdf(false);
-        alert('PDF olusturulurken bir hata olustu. Lutfen tekrar deneyin.');
-      });
+    try {
+      // Dynamically import html2pdf.js only on client side
+      const html2pdfModule = await import('html2pdf.js');
+      const html2pdf = html2pdfModule.default;
+      
+      const element = ticketRef.current;
+      const opt = {
+        margin: 10,
+        filename: `CodeFusion2025-Bilet-${data.id}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          logging: true 
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait' 
+        }
+      };
+      
+      // Create PDF
+      const worker = html2pdf().from(element).set(opt);
+      
+      await worker.save();
+      console.log('PDF basariyla olusturuldu');
+    } catch (error) {
+      console.error('PDF olusturma hatasi:', error);
+      alert('PDF olusturulurken bir hata olustu. Lutfen tekrar deneyin.');
+    } finally {
+      setDownloadingPdf(false);
+    }
   };
 
   // QR Kodu icin rastgele veriler olusturuyoruz (gercekte bilet ID'si kullanilabilir)
