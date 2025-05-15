@@ -108,10 +108,9 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
     }
     
     setDownloadingPdf(true);
-    let tempDiv = null;
+    let tempDiv: HTMLDivElement | null = null;
     
     try {
-      // html2pdf.js ile ilgili çok fazla sorun var, daha garantili bir yaklaşım kullanalım
       // Müdahale etmeden önce bilet verilerini alalım
       const ticketData = {
         id: data.id,
