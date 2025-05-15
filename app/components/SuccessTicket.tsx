@@ -78,6 +78,107 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
       const html2pdf = html2pdfModule.default;
       
       const element = ticketRef.current;
+      
+      // QR kodunu geçici olarak depolayalım
+      const qrImageElement = element.querySelector('img[alt="QR Code"]') as HTMLImageElement;
+      let originalQrSrc = '';
+      
+      if (qrImageElement) {
+        // QR resminin orijinal kaynağını kaydedelim
+        originalQrSrc = qrImageElement.src;
+        
+        // CORS sorunlarını önlemek için QR kodu için bir çözüm uygulayalım
+        try {
+          // QR kodunu bir canvas üzerinde çizerek veri URL'sine dönüştürelim
+          const canvas = document.createElement('canvas');
+          canvas.width = qrImageElement.width || 120;
+          canvas.height = qrImageElement.height || 120;
+          const ctx = canvas.getContext('2d');
+          
+          if (ctx) {
+            // Beyaz bir arka plan ekleyelim
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Resim yüklenene kadar bekleyelim
+            await new Promise((resolve, reject) => {
+              qrImageElement.crossOrigin = 'anonymous'; // CORS için gerekli
+              qrImageElement.onload = resolve;
+              qrImageElement.onerror = reject;
+              // QR kodu yüklemek için yeni bir URL ile deneyelim
+              qrImageElement.src = originalQrSrc + '&cachebust=' + new Date().getTime();
+              
+              // Eğer resim zaten yüklenmişse resolve çağrılır
+              if (qrImageElement.complete) {
+                resolve(null);
+              }
+              
+              // 3 saniye sonra otomatik olarak devam et
+              setTimeout(resolve, 3000);
+            });
+            
+            // Resmi canvas'a çiz
+            try {
+              ctx.drawImage(qrImageElement, 0, 0, canvas.width, canvas.height);
+              qrImageElement.src = canvas.toDataURL('image/png');
+            } catch (e) {
+              console.warn('QR kodu canvas\'a çizilirken hata:', e);
+              // Hata durumunda yerine temel bir QR kodu koy
+              ctx.fillStyle = 'black';
+              ctx.font = '10px Arial';
+              ctx.fillText('QR Code', 35, 60);
+              qrImageElement.src = canvas.toDataURL('image/png');
+            }
+          }
+        } catch (error) {
+          console.warn('QR kodu dönüştürme hatası:', error);
+          // Hataya rağmen pdf oluşturma işlemine devam et
+        }
+      }
+      
+      // Avatar resmini de işleyelim
+      const avatarElement = element.querySelector('img[alt="' + data.name + '"]') as HTMLImageElement;
+      if (avatarElement && data.avatar) {
+        try {
+          // Avatar için de benzer bir çözüm uygulayalım
+          const canvas = document.createElement('canvas');
+          canvas.width = avatarElement.width || 64;
+          canvas.height = avatarElement.height || 64;
+          const ctx = canvas.getContext('2d');
+          
+          if (ctx) {
+            // Resim yüklenene kadar bekleyelim
+            await new Promise((resolve) => {
+              setTimeout(resolve, 500); // Kısa bir bekleme yeterli
+            });
+            
+            try {
+              // Kullanıcı avatarını çizmeyi dene
+              ctx.drawImage(avatarElement, 0, 0, canvas.width, canvas.height);
+              avatarElement.src = canvas.toDataURL('image/png');
+            } catch (e) {
+              console.warn('Avatar canvas\'a çizilirken hata:', e);
+              // Hata durumunda renkli bir daire koy
+              ctx.fillStyle = '#6366f1';
+              ctx.beginPath();
+              ctx.arc(canvas.width/2, canvas.height/2, canvas.width/2, 0, Math.PI * 2);
+              ctx.fill();
+              
+              // Kullanıcı adının ilk harfini ekle
+              ctx.fillStyle = 'white';
+              ctx.font = 'bold 28px Arial';
+              ctx.textAlign = 'center';
+              ctx.fillText(data.name.charAt(0), canvas.width/2, canvas.height/2 + 10);
+              
+              avatarElement.src = canvas.toDataURL('image/png');
+            }
+          }
+        } catch (error) {
+          console.warn('Avatar dönüştürme hatası:', error);
+          // Hataya rağmen pdf oluşturma işlemine devam et
+        }
+      }
+      
       const opt = {
         margin: 10,
         filename: `CodeFusion2025-Bilet-${data.id}.pdf`,
@@ -85,7 +186,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
         html2canvas: { 
           scale: 2,
           useCORS: true,
-          logging: true 
+          logging: false // Hata ayıklama dışında kapalı tutun
         },
         jsPDF: { 
           unit: 'mm', 
@@ -94,11 +195,35 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
         }
       };
       
-      // Create PDF
+      // PDF oluşturma sürecine bir zaman aşımı ekleyelim
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error('PDF oluşturma zaman aşımına uğradı'));
+        }, 30000); // 30 saniye zaman aşımı
+      });
+      
+      // Create PDF with timeout
       const worker = html2pdf().from(element).set(opt);
       
-      await worker.save();
-      console.log('PDF basariyla olusturuldu');
+      try {
+        await Promise.race([
+          worker.save(),
+          timeoutPromise
+        ]);
+        console.log('PDF basariyla olusturuldu');
+      } catch (error) {
+        throw error; // Yukarıdaki catch bloğunda yakalanacak
+      } finally {
+        // QR kodunu orijinal durumuna geri döndür
+        if (qrImageElement && originalQrSrc) {
+          qrImageElement.src = originalQrSrc;
+        }
+        
+        // Avatar elementini de sıfırla
+        if (avatarElement && data.avatar) {
+          avatarElement.src = data.avatar;
+        }
+      }
     } catch (error) {
       console.error('PDF olusturma hatasi:', error);
       alert('PDF olusturulurken bir hata olustu. Lutfen tekrar deneyin.');
