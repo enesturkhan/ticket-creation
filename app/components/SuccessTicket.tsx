@@ -25,6 +25,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
   const [emailSent, setEmailSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [usingFallback, setUsingFallback] = useState(false);
   const ticketRef = useRef<HTMLDivElement>(null);
 
   const getDayLabel = (day: string): string => {
@@ -60,6 +61,42 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
     }
   };
   
+  // Yedek çözüm - Basit bir text dosyası indir
+  const handleFallbackDownload = () => {
+    const ticketText = `
+=== CODEFUSION 2025 ETKINLIK BILETI ===
+
+BILET NO: ${data.id}
+TARIH: ${data.date}
+
+KATILIMCI BILGILERI:
+Ad Soyad: ${data.name}
+E-posta: ${data.email}
+Meslek: ${data.profession}
+Katılım Türü: ${getTypeLabel(data.type)}
+
+KATILIM GUNLERI:
+${data.days.map(day => '- ' + getDayLabel(day)).join('\n')}
+
+ETKINLIK YERI:
+Teknoloji Merkezi
+Ankara, Turkiye
+Kongre Salonu, Kat 3
+
+Kapı Açılış: 08:30
+
+Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
+    `;
+
+    const element = document.createElement('a');
+    const file = new Blob([ticketText], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = `CodeFusion2025-Bilet-${data.id}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
   // PDF olarak indirme
   const handleDownloadPdf = async () => {
     if (!ticketRef.current) return;
@@ -71,164 +108,207 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
     }
     
     setDownloadingPdf(true);
+    let tempDiv = null;
     
     try {
-      // Dynamically import html2pdf.js only on client side
-      const html2pdfModule = await import('html2pdf.js');
-      const html2pdf = html2pdfModule.default;
+      // html2pdf.js ile ilgili çok fazla sorun var, daha garantili bir yaklaşım kullanalım
+      // Müdahale etmeden önce bilet verilerini alalım
+      const ticketData = {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        profession: data.profession,
+        type: getTypeLabel(data.type),
+        days: data.days.map(day => getDayLabel(day)),
+        date: data.date
+      };
       
-      const element = ticketRef.current;
-      
-      // QR kodunu geçici olarak depolayalım
-      const qrImageElement = element.querySelector('img[alt="QR Code"]') as HTMLImageElement;
-      let originalQrSrc = '';
-      
-      if (qrImageElement) {
-        // QR resminin orijinal kaynağını kaydedelim
-        originalQrSrc = qrImageElement.src;
-        
-        // CORS sorunlarını önlemek için QR kodu için bir çözüm uygulayalım
+      // DOM'a bir temizlik işlevi ekleyelim, işlem ne olursa olsun çalışsın
+      const cleanupDOM = () => {
         try {
-          // QR kodunu bir canvas üzerinde çizerek veri URL'sine dönüştürelim
-          const canvas = document.createElement('canvas');
-          canvas.width = qrImageElement.width || 120;
-          canvas.height = qrImageElement.height || 120;
-          const ctx = canvas.getContext('2d');
-          
-          if (ctx) {
-            // Beyaz bir arka plan ekleyelim
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Resim yüklenene kadar bekleyelim
-            await new Promise((resolve, reject) => {
-              qrImageElement.crossOrigin = 'anonymous'; // CORS için gerekli
-              qrImageElement.onload = resolve;
-              qrImageElement.onerror = reject;
-              // QR kodu yüklemek için yeni bir URL ile deneyelim
-              qrImageElement.src = originalQrSrc + '&cachebust=' + new Date().getTime();
-              
-              // Eğer resim zaten yüklenmişse resolve çağrılır
-              if (qrImageElement.complete) {
-                resolve(null);
-              }
-              
-              // 3 saniye sonra otomatik olarak devam et
-              setTimeout(resolve, 3000);
-            });
-            
-            // Resmi canvas'a çiz
-            try {
-              ctx.drawImage(qrImageElement, 0, 0, canvas.width, canvas.height);
-              qrImageElement.src = canvas.toDataURL('image/png');
-            } catch (e) {
-              console.warn('QR kodu canvas\'a çizilirken hata:', e);
-              // Hata durumunda yerine temel bir QR kodu koy
-              ctx.fillStyle = 'black';
-              ctx.font = '10px Arial';
-              ctx.fillText('QR Code', 35, 60);
-              qrImageElement.src = canvas.toDataURL('image/png');
-            }
+          // Geçici div'i temizle
+          if (tempDiv && document.body.contains(tempDiv)) {
+            document.body.removeChild(tempDiv);
           }
-        } catch (error) {
-          console.warn('QR kodu dönüştürme hatası:', error);
-          // Hataya rağmen pdf oluşturma işlemine devam et
-        }
-      }
-      
-      // Avatar resmini de işleyelim
-      const avatarElement = element.querySelector('img[alt="' + data.name + '"]') as HTMLImageElement;
-      if (avatarElement && data.avatar) {
-        try {
-          // Avatar için de benzer bir çözüm uygulayalım
-          const canvas = document.createElement('canvas');
-          canvas.width = avatarElement.width || 64;
-          canvas.height = avatarElement.height || 64;
-          const ctx = canvas.getContext('2d');
-          
-          if (ctx) {
-            // Resim yüklenene kadar bekleyelim
-            await new Promise((resolve) => {
-              setTimeout(resolve, 500); // Kısa bir bekleme yeterli
-            });
-            
-            try {
-              // Kullanıcı avatarını çizmeyi dene
-              ctx.drawImage(avatarElement, 0, 0, canvas.width, canvas.height);
-              avatarElement.src = canvas.toDataURL('image/png');
-            } catch (e) {
-              console.warn('Avatar canvas\'a çizilirken hata:', e);
-              // Hata durumunda renkli bir daire koy
-              ctx.fillStyle = '#6366f1';
-              ctx.beginPath();
-              ctx.arc(canvas.width/2, canvas.height/2, canvas.width/2, 0, Math.PI * 2);
-              ctx.fill();
-              
-              // Kullanıcı adının ilk harfini ekle
-              ctx.fillStyle = 'white';
-              ctx.font = 'bold 28px Arial';
-              ctx.textAlign = 'center';
-              ctx.fillText(data.name.charAt(0), canvas.width/2, canvas.height/2 + 10);
-              
-              avatarElement.src = canvas.toDataURL('image/png');
-            }
-          }
-        } catch (error) {
-          console.warn('Avatar dönüştürme hatası:', error);
-          // Hataya rağmen pdf oluşturma işlemine devam et
-        }
-      }
-      
-      const opt = {
-        margin: 10,
-        filename: `CodeFusion2025-Bilet-${data.id}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 2,
-          useCORS: true,
-          logging: false // Hata ayıklama dışında kapalı tutun
-        },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
-          orientation: 'portrait' 
+        } catch (cleanupError) {
+          console.error('Temizlik hatası:', cleanupError);
         }
       };
       
-      // PDF oluşturma sürecine bir zaman aşımı ekleyelim
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => {
-          reject(new Error('PDF oluşturma zaman aşımına uğradı'));
-        }, 30000); // 30 saniye zaman aşımı
-      });
-      
-      // Create PDF with timeout
-      const worker = html2pdf().from(element).set(opt);
-      
       try {
-        await Promise.race([
-          worker.save(),
-          timeoutPromise
-        ]);
-        console.log('PDF basariyla olusturuldu');
-      } catch (error) {
-        throw error; // Yukarıdaki catch bloğunda yakalanacak
-      } finally {
-        // QR kodunu orijinal durumuna geri döndür
-        if (qrImageElement && originalQrSrc) {
-          qrImageElement.src = originalQrSrc;
-        }
+        // En basit şekilde html2pdf.js'yi kullanalım
+        const html2pdfModule = await import('html2pdf.js');
+        const html2pdf = html2pdfModule.default;
         
-        // Avatar elementini de sıfırla
-        if (avatarElement && data.avatar) {
-          avatarElement.src = data.avatar;
-        }
+        // Tamamen basit bir HTML yapısı oluşturalım
+        const simplifiedHTML = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+            <div style="background: linear-gradient(to right, #2563eb, #7c3aed); color: white; padding: 15px; border-radius: 10px 10px 0 0; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h2 style="margin: 0; font-size: 18px;">CodeFusion 2025</h2>
+                <p style="margin: 5px 0 0; font-size: 14px; opacity: 0.8;">Yazilim Gelistirici Konferansi</p>
+              </div>
+              <div style="text-align: right; font-size: 14px;">
+                <p style="margin: 0;">Bilet No: ${ticketData.id}</p>
+                <p style="margin: 0;">${ticketData.date}</p>
+              </div>
+            </div>
+            
+            <div style="display: flex; flex-direction: row; background-color: white; border-radius: 0 0 10px 10px; border: 1px solid #e5e7eb; border-top: none;">
+              <div style="flex: 1; padding: 20px;">
+                <div style="display: flex; margin-bottom: 20px;">
+                  <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(to right, #60a5fa, #a78bfa); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px; border: 4px solid #f3e8ff; margin-right: 15px;">
+                    ${ticketData.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 style="margin: 0 0 5px; font-size: 18px;">${ticketData.name}</h3>
+                    <p style="margin: 0 0 3px; color: #4b5563;">${ticketData.profession}</p>
+                    <p style="margin: 0; font-size: 14px; color: #6b7280;">${ticketData.email}</p>
+                  </div>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                  <p style="margin: 0 0 5px; font-size: 14px; color: #6b7280;">Katilim Turu</p>
+                  <p style="margin: 0; font-weight: 500;">${ticketData.type}</p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                  <p style="margin: 0 0 5px; font-size: 14px; color: #6b7280;">Etkinlik Gunleri</p>
+                  <div>
+                    ${ticketData.days.map(day => `
+                      <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                        <span style="color: #10b981; margin-right: 8px;">✓</span>
+                        <span>${day}</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #f3f4f6;">
+                  <p style="margin: 0 0 10px; font-size: 14px; color: #6b7280;">Etkinlik Yeri</p>
+                  <div style="display: flex;">
+                    <div style="margin-right: 10px; color: #9ca3af;">📍</div>
+                    <div>
+                      <p style="margin: 0 0 3px; font-weight: 500;">Teknoloji Merkezi</p>
+                      <p style="margin: 0 0 3px; color: #4b5563;">Ankara, Turkiye</p>
+                      <p style="margin: 0; font-size: 14px; color: #6b7280;">Kongre Salonu, Kat 3</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div style="padding: 20px; background-color: #f9fafb; display: flex; flex-direction: column; align-items: center; border-left: 1px solid #e5e7eb;">
+                <div style="background-color: white; padding: 10px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 15px;">
+                  <div style="width: 120px; height: 120px; background-color: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 12px; text-align: center; color: #6b7280;">
+                    [QR Kod]<br>Biletin fiziksel versiyonunda yer alacaktir
+                  </div>
+                </div>
+                <p style="font-size: 12px; color: #6b7280; text-align: center; max-width: 150px;">
+                  Bu QR kodu etkinlige giris icin tarattiriniz
+                </p>
+              </div>
+            </div>
+            
+            <div style="background-color: #f9fafb; padding: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px; text-align: center;">
+              <p style="margin: 0; font-size: 14px; color: #6b7280;">
+                <span style="font-weight: 500; color: #4b5563;">22-24 Kasim 2025</span> • Kapi Acilis: 08:30
+              </p>
+            </div>
+          </div>
+        `;
+        
+        // Basit HTML'i bir div içine yerleştir
+        tempDiv = document.createElement('div');
+        tempDiv.innerHTML = simplifiedHTML;
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '-9999px';
+        document.body.appendChild(tempDiv);
+        
+        // PDF Oluşturma Seçenekleri
+        const opt = {
+          margin: 10,
+          filename: `CodeFusion2025-Bilet-${data.id}.pdf`,
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: { 
+            scale: 2,
+            useCORS: false, 
+            logging: false
+          },
+          jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait'
+          }
+        };
+        
+        // Basit zaman aşımı
+        let pdfCompleted = false;
+        
+        // PDF işleminin kendisi
+        const pdfPromise = html2pdf().from(tempDiv).set(opt).save().then(() => {
+          pdfCompleted = true;
+          console.log('PDF başarıyla oluşturuldu');
+        });
+        
+        // Zaman aşımı kontrolü
+        const timeoutPromise = new Promise((_resolve, reject) => {
+          setTimeout(() => {
+            if (!pdfCompleted) {
+              reject(new Error('PDF oluşturma zaman aşımına uğradı'));
+            }
+          }, 7000);
+        });
+        
+        await Promise.race([pdfPromise, timeoutPromise]);
+      } catch (error) {
+        console.error('HTML2PDF hatası:', error);
+        setUsingFallback(true);
+        throw error;
+      } finally {
+        // HTML2PDF'in her durumda DOM'dan temizlenmesi
+        setTimeout(() => {
+          if (tempDiv) {
+            cleanupDOM();
+          }
+        }, 500);
       }
     } catch (error) {
-      console.error('PDF olusturma hatasi:', error);
-      alert('PDF olusturulurken bir hata olustu. Lutfen tekrar deneyin.');
+      console.error('PDF oluşturma hatası:', error);
+      
+      if (!usingFallback) {
+        setUsingFallback(true);
+        // Kullanıcıya seçenek sunalım
+        try {
+          const userChoice = window.confirm(
+            'PDF oluşturulurken bir sorun oluştu. Bilet bilgilerinizi metin dosyası olarak indirmek ister misiniz?'
+          );
+          
+          if (userChoice) {
+            handleFallbackDownload();
+          }
+        } catch (confirmError) {
+          console.error('Kullanıcı onay hatası:', confirmError);
+          // Onay alınamadıysa otomatik olarak metin indirmeyi deneyelim
+          handleFallbackDownload();
+        }
+      } else {
+        alert('Bilet indirmede sorun oluştu. Lütfen daha sonra tekrar deneyin.');
+      }
     } finally {
+      // Her durumda düğmeyi serbest bırak
       setDownloadingPdf(false);
+      // PDF işlemi tamamlandıktan sonra yedek seçeneği sıfırlayalım
+      setTimeout(() => setUsingFallback(false), 500);
+      
+      // Sayfanın kilitlenmemesi için tarayıcıyı yenilemeyi önermek için son bir kontrol
+      if (tempDiv && document.body.contains(tempDiv)) {
+        try {
+          document.body.removeChild(tempDiv);
+        } catch (finalError) {
+          console.error('Son temizlik hatası:', finalError);
+        }
+      }
     }
   };
 
@@ -392,7 +472,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
             {/* QR Kodu */}
             <div className="bg-gray-50 p-6 flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-gray-200">
               <div className="mb-4 bg-white p-2 rounded-lg shadow-md">
-                <Image 
+                <img 
                   src={qrCodeUrl} 
                   alt="QR Code"
                   width={120} 
@@ -432,7 +512,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
                 <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                PDF Olarak Indir
+                {usingFallback ? 'Metin Olarak İndir' : 'PDF Olarak İndir'}
               </>
             )}
           </button>
