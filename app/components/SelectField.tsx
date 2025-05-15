@@ -37,7 +37,9 @@ export default function SelectField({
         id={id}
         required={required}
         value={value || ''}
-        onChange={(e: any) => onChange && onChange(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+          onChange && onChange(e.target.value)
+        }
         aria-invalid={error ? 'true' : 'false'}
         aria-describedby={error ? `${id}-error` : description ? `${id}-description` : undefined}
         className={`w-full px-4 py-2 border bg-white/20 ${
