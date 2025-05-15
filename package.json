@@ -4,11 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --no-typescript",
+    "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "vercel-build": "CI=false next build --no-typescript",
-    "deploy": "vercel"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

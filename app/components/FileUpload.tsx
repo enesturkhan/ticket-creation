@@ -16,7 +16,7 @@ interface FileUploadProps {
 export default function FileUpload({
   id,
   label,
-  description = 'Dosya yuklemek icin tiklayin veya surukleyin.',
+  description = 'Dosya yüklemek için tıklayın veya sürükleyin.',
   required = false,
   accept = 'image/jpeg, image/png',
   error,
@@ -26,7 +26,7 @@ export default function FileUpload({
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Dosya degistiginde onChange prop fonksiyonunu cagir
+  // Dosya değiştiğinde onChange prop fonksiyonunu çağır
   useEffect(() => {
     if (onChange) {
       onChange(selectedFile);
@@ -38,7 +38,7 @@ export default function FileUpload({
       const file = e.target.files[0];
       setSelectedFile(file);
       
-      // Onizleme olustur
+      // Önizleme oluştur
       const reader = new FileReader();
       reader.onload = () => {
         setPreview(reader.result as string);
@@ -63,14 +63,14 @@ export default function FileUpload({
       const file = e.dataTransfer.files[0];
       setSelectedFile(file);
       
-      // Onizleme olustur
+      // Önizleme oluştur
       const reader = new FileReader();
       reader.onload = () => {
         setPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
       
-      // Dosya girisini guncelle
+      // Dosya girişini güncelle
       if (fileInputRef.current) {
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
@@ -79,7 +79,7 @@ export default function FileUpload({
     }
   };
 
-  // Dosyayi temizler
+  // Dosyayı temizler
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedFile(null);
@@ -117,7 +117,7 @@ export default function FileUpload({
               <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-indigo-300/30">
                 <Image 
                   src={preview}
-                  alt="Onizleme"
+                  alt="Önizleme"
                   fill
                   style={{ objectFit: 'cover' }}
                 />
@@ -126,9 +126,9 @@ export default function FileUpload({
                 type="button"
                 onClick={handleClear}
                 className="mt-2 text-xs text-red-300 hover:text-red-400"
-                aria-label="Fotografi kaldir"
+                aria-label="Fotoğrafı kaldır"
               >
-                Kaldir
+                Kaldır
               </button>
             </div>
           ) : (
