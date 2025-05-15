@@ -30,10 +30,10 @@ export default function CheckboxGroup({
     if (!onChange) return;
     
     if (checked) {
-      // Eğer kutucuk işaretlendiyse, değeri ekle
+      // Eger kutucuk isaretlendiyse, degeri ekle
       onChange([...value, optionValue]);
     } else {
-      // Eğer kutucuk işareti kaldırıldıysa, değeri çıkar
+      // Eger kutucuk isareti kaldirildiysa, degeri cikar
       onChange(value.filter(val => val !== optionValue));
     }
   };

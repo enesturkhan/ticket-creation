@@ -30,17 +30,17 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
 
   const getDayLabel = (day: string): string => {
     const dayLabels: Record<string, string> = {
-      'gun1': '22 Kasım: Atölyeler',
-      'gun2': '23 Kasım: Konferanslar',
-      'gun3': '24 Kasım: Ağ Kurma',
+      'gun1': '22 Kasim: Atolyeler',
+      'gun2': '23 Kasim: Konferanslar',
+      'gun3': '24 Kasim: Ag Kurma',
     };
     return dayLabels[day] || day;
   };
 
   const getTypeLabel = (type: string): string => {
     const typeLabels: Record<string, string> = {
-      'izleyici': 'İzleyici',
-      'konusmaci': 'Konuşmacı',
+      'izleyici': 'Izleyici',
+      'konusmaci': 'Konusmaci',
       'sponsor': 'Sponsor',
     };
     return typeLabels[type] || type;
@@ -108,14 +108,14 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
       try {
         await navigator.share({
           title: 'CodeFusion 2025 Biletim',
-          text: `CodeFusion 2025'e katılıyorum! ${data.days.length} gün boyunca muhteşem etkinlikler için heyecanlıyım.`,
+          text: `CodeFusion 2025'e katiliyorum! ${data.days.length} gun boyunca muhtesem etkinlikler icin heyecanliyim.`,
           url: window.location.href,
         });
       } catch (error) {
-        console.error('Paylaşma hatası:', error);
+        console.error('Paylasma hatasi:', error);
       }
     } else {
-      alert('Tarayıcınız paylaşma özelliğini desteklemiyor. Bağlantıyı kopyalayıp manuel olarak paylaşabilirsiniz.');
+      alert('Tarayiciniz paylasma ozelligini desteklemiyor. Baglantiyi kopyalayip manuel olarak paylasabilirsiniz.');
     }
   };
 
@@ -139,10 +139,10 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">
-            Kayıt Başarılı!
+            Kayit Basarili!
           </h1>
           <p className="text-white/80 mb-8">
-            CodeFusion 2025 etkinliğine katılımınız onaylandı. Bilet detaylarınız aşağıdadır.
+            CodeFusion 2025 etkinligine katiliminiz onaylandi. Bilet detaylariniz asagidadir.
           </p>
 
           {emailSent ? (
@@ -150,7 +150,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
               <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
-              <p>Biletiniz <strong>{data.email}</strong> adresine gönderildi.</p>
+              <p>Biletiniz <strong>{data.email}</strong> adresine gonderildi.</p>
             </div>
           ) : (
             <button 
@@ -161,7 +161,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
               {sending ? (
                 <>
                   <span className="animate-spin h-4 w-4 mr-2 border-2 border-white rounded-full border-t-transparent"></span>
-                  Gönderiliyor...
+                  Gonderiliyor...
                 </>
               ) : (
                 <>
@@ -180,7 +180,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-4 px-6 flex justify-between items-center">
             <div>
               <h2 className="text-white font-bold text-lg">CodeFusion 2025</h2>
-              <p className="text-white/80 text-sm">Yazılım Geliştirici Konferansı</p>
+              <p className="text-white/80 text-sm">Yazilim Gelistirici Konferansi</p>
             </div>
             <div className="text-white text-sm text-right">
               <p>Bilet No: {data.id}</p>
@@ -219,11 +219,11 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
               <div className="border-t border-gray-200 pt-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-gray-500 text-sm">Katılım Türü</p>
+                    <p className="text-gray-500 text-sm">Katilim Turu</p>
                     <p className="font-medium">{getTypeLabel(data.type)}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500 text-sm">Katılım Günleri</p>
+                    <p className="text-gray-500 text-sm">Katilim Gunleri</p>
                     <div>
                       {data.days.map((day) => (
                         <span key={day} className="inline-block bg-purple-100 text-purple-700 text-xs font-medium rounded-full px-2 py-1 mr-1 mb-1">
@@ -246,14 +246,14 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
                   height={120}
                 />
               </div>
-              <p className="mt-2 text-sm text-gray-500 text-center">Etkinliğe girişte bu QR kodu gösteriniz</p>
+              <p className="mt-2 text-sm text-gray-500 text-center">Etkinlige giriste bu QR kodu gosteriniz</p>
             </div>
           </div>
 
           {/* Alt Kısım */}
           <div className="bg-gray-50 py-4 px-6 flex justify-between items-center">
             <p className="text-gray-600 text-sm">
-              22-24 Kasım 2025
+              22-24 Kasim 2025
             </p>
             <p className="text-gray-600 text-sm">
               İstanbul Kongre Merkezi

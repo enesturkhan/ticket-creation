@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build --no-typescript",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "vercel-build": "CI=false next build --no-typescript",
+    "deploy": "vercel"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

@@ -46,7 +46,7 @@ export default function SelectField({
           error ? 'focus:ring-red-500' : 'focus:ring-indigo-500'
         } text-white`}
       >
-        <option value="" className="bg-indigo-900">Seçiniz</option>
+        <option value="" className="bg-indigo-900">Seciniz</option>
         {options.map((option) => (
           <option key={option.value} value={option.value} className="bg-indigo-900">
             {option.label}
