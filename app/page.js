@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 export default function Home() {
   const [text, setText] = useState("");
@@ -50,10 +50,10 @@ export default function Home() {
     document.documentElement.classList.toggle('dark', prefersDark);
   }, []);
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+  const toggleTheme = useCallback(() => {
+    setIsDarkMode(prevState => !prevState);
     document.documentElement.classList.toggle('dark');
-  };
+  }, []);
 
   // Metin analiz fonksiyonu
   useEffect(() => {
