@@ -139,6 +139,9 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
         const html2pdfModule = await import('html2pdf.js');
         const html2pdf = html2pdfModule.default;
         
+        // QR kod URL'sini oluştur
+        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=CODEFUSION2025-${data.id}-${encodeURIComponent(data.email)}`;
+        
         // Tamamen basit bir HTML yapısı oluşturalım
         const simplifiedHTML = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
@@ -198,9 +201,11 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
               
               <div style="padding: 20px; background-color: #f9fafb; display: flex; flex-direction: column; align-items: center; border-left: 1px solid #e5e7eb;">
                 <div style="background-color: white; padding: 10px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 15px;">
-                  <div style="width: 120px; height: 120px; background-color: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 12px; text-align: center; color: #6b7280;">
-                    [QR Kod]<br>Biletin fiziksel versiyonunda yer alacaktir
-                  </div>
+                  <img 
+                    src="${qrCodeUrl}" 
+                    alt="QR Code"
+                    style="width: 120px; height: 120px;"
+                  />
                 </div>
                 <p style="font-size: 12px; color: #6b7280; text-align: center; max-width: 150px;">
                   Bu QR kodu etkinlige giris icin tarattiriniz
@@ -224,6 +229,15 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
         tempDiv.style.top = '-9999px';
         document.body.appendChild(tempDiv);
         
+        // QR kodun yüklenmesini bekle
+        const qrImage = tempDiv.querySelector('img');
+        if (qrImage) {
+          await new Promise((resolve) => {
+            qrImage.onload = resolve;
+            qrImage.onerror = resolve; // Hata durumunda da devam et
+          });
+        }
+        
         // PDF Oluşturma Seçenekleri
         const opt = {
           margin: 10,
@@ -231,8 +245,9 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
           image: { type: 'jpeg', quality: 0.95 },
           html2canvas: { 
             scale: 2,
-            useCORS: false, 
-            logging: false
+            useCORS: true, // CORS'u etkinleştir
+            logging: false,
+            allowTaint: true // Dış kaynaklara izin ver
           },
           jsPDF: { 
             unit: 'mm', 
@@ -256,7 +271,7 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
             if (!pdfCompleted) {
               reject(new Error('PDF oluşturma zaman aşımına uğradı'));
             }
-          }, 7000);
+          }, 10000); // Zaman aşımı süresini artırdık
         });
         
         await Promise.race([pdfPromise, timeoutPromise]);
