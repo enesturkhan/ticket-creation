@@ -1,37 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CodeFusion 2025 - Yazılım Konferansı",
-  description: "22-24 Kasım 2025 tarihleri arasında İstanbul'da gerçekleşecek olan CodeFusion 2025 yazılım konferansı",
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-icon.png',
-  },
+  title: "CodeFusion 2025",
+  description: "CodeFusion 2025 Etkinlik Bilet Sistemi"
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="tr">
+      <body className={inter.className}>
+        <div className="min-h-screen bg-gradient-to-br from-[#1e293b] to-[#111827]">
+          <div className="container mx-auto px-4 py-8">
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );
