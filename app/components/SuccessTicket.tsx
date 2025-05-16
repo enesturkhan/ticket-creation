@@ -98,6 +98,29 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
             clonedElement.style.display = 'block';
             clonedElement.style.visibility = 'visible';
             clonedElement.style.opacity = '1';
+            
+            // Tüm gradient ve rgba renkleri düz renklere dönüştür
+            const elements = clonedElement.getElementsByTagName('*');
+            for (let i = 0; i < elements.length; i++) {
+              const el = elements[i] as HTMLElement;
+              const style = window.getComputedStyle(el);
+              
+              // Gradient arka planları düz renge dönüştür
+              if (style.backgroundImage && style.backgroundImage !== 'none') {
+                if (style.backgroundImage.includes('gradient')) {
+                  el.style.backgroundImage = 'none';
+                  el.style.backgroundColor = '#2563eb'; // Varsayılan mavi renk
+                }
+              }
+              
+              // rgba renkleri hex'e dönüştür
+              if (style.color && style.color.includes('rgba')) {
+                el.style.color = '#000000';
+              }
+              if (style.backgroundColor && style.backgroundColor.includes('rgba')) {
+                el.style.backgroundColor = '#ffffff';
+              }
+            }
           }
         }
       });
