@@ -52,41 +52,59 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
 
   // PDF olarak indirme
   const handleDownloadPdf = async () => {
-    if (!ticketRef.current) {
+    const element = document.getElementById('bilet-pdf');
+    if (!element) {
       console.error('Bilet elementi bulunamadı');
       return;
     }
-    
+
+    // Elementin görünür olduğundan emin ol
+    const style = window.getComputedStyle(element);
+    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+      console.error('Bilet elementi görünür değil');
+      return;
+    }
+
     setDownloadingPdf(true);
-    
+
     try {
-      console.log('PDF oluşturma başladı...');
+      // İçeriğin tamamen yüklenmesi için bekle
+      await new Promise((res) => setTimeout(res, 500));
 
       // QR kodun yüklenmesini bekle
-      const qrImage = ticketRef.current.querySelector('img');
+      const qrImage = element.querySelector('img');
       if (qrImage) {
-        console.log('QR kod yükleniyor...');
         await new Promise((resolve) => {
-          qrImage.onload = resolve;
-          qrImage.onerror = resolve;
+          if (qrImage.complete) {
+            resolve(true);
+          } else {
+            qrImage.onload = () => resolve(true);
+            qrImage.onerror = () => resolve(false);
+          }
         });
       }
 
-      console.log('Canvas oluşturuluyor...');
-      // HTML'i canvas'a çevir
-      const canvas = await html2canvas(ticketRef.current, {
+      // Canvas oluştur
+      const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
-        logging: true, // Hata ayıklama için true yapıyoruz
         allowTaint: true,
-        backgroundColor: '#ffffff' // Arka plan rengini beyaz yapıyoruz
+        backgroundColor: '#ffffff',
+        logging: true,
+        onclone: (clonedDoc) => {
+          // Klonlanmış dokümanda elementin görünür olduğundan emin ol
+          const clonedElement = clonedDoc.getElementById('bilet-pdf');
+          if (clonedElement) {
+            clonedElement.style.display = 'block';
+            clonedElement.style.visibility = 'visible';
+            clonedElement.style.opacity = '1';
+          }
+        }
       });
 
-      console.log('Canvas PNG\'ye çevriliyor...');
       // Canvas'ı PNG'ye çevir
       const imgData = canvas.toDataURL('image/png', 1.0);
 
-      console.log('PDF oluşturuluyor...');
       // PDF oluştur
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -94,15 +112,12 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
         format: [canvas.width, canvas.height]
       });
 
-      console.log('Görüntü PDF\'e ekleniyor...');
       // Görüntüyü PDF'e ekle
       pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
 
-      console.log('PDF kaydediliyor...');
       // PDF'i indir
       pdf.save(`CodeFusion2025-Bilet-${data.id}.pdf`);
 
-      console.log('PDF başarıyla oluşturuldu!');
     } catch (error) {
       console.error('PDF oluşturma hatası:', error);
       alert('PDF oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
