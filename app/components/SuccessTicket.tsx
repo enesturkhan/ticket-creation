@@ -90,227 +90,27 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
   const handleDownloadPdf = async () => {
     if (!ticketRef.current) return;
     
-    // Make sure we're in a browser environment
-    if (typeof window === 'undefined') {
-      console.error('PDF generation can only be performed in a browser environment');
-      return;
-    }
-    
     setDownloadingPdf(true);
-    let tempDiv: HTMLDivElement | null = null;
     
     try {
-      // Müdahale etmeden önce bilet verilerini alalım
-      const ticketData = {
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        profession: data.profession,
-        days: data.days.map(day => getDayLabel(day)),
-        date: data.date
-      };
+      const html2pdfModule = await import('html2pdf.js');
+      const html2pdf = html2pdfModule.default;
       
-      // DOM'a bir temizlik işlevi ekleyelim, işlem ne olursa olsun çalışsın
-      const cleanupDOM = () => {
-        try {
-          // Geçici div'i temizle
-          if (tempDiv && document.body.contains(tempDiv)) {
-            document.body.removeChild(tempDiv);
-          }
-        } catch (cleanupError) {
-          console.error('Temizlik hatası:', cleanupError);
-        }
+      const opt = {
+        margin: 0.5,
+        filename: `CodeFusion2025-Bilet-${data.id}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
-      
-      try {
-        // En basit şekilde html2pdf.js'yi kullanalım
-        const html2pdfModule = await import('html2pdf.js');
-        const html2pdf = html2pdfModule.default;
-        
-        // QR kod URL'sini oluştur
-        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=CODEFUSION2025-${data.id}-${encodeURIComponent(data.email)}`;
-        
-        // Tamamen basit bir HTML yapısı oluşturalım
-        const simplifiedHTML = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-            <div style="background: linear-gradient(to right, #2563eb, #7c3aed); color: white; padding: 15px; border-radius: 10px 10px 0 0; display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <h2 style="margin: 0; font-size: 18px;">CodeFusion 2025</h2>
-                <p style="margin: 5px 0 0; font-size: 14px; opacity: 0.8;">Yazilim Gelistirici Konferansi</p>
-              </div>
-              <div style="text-align: right; font-size: 14px;">
-                <p style="margin: 0;">Bilet No: ${ticketData.id}</p>
-                <p style="margin: 0;">${ticketData.date}</p>
-              </div>
-            </div>
-            
-            <div style="display: flex; flex-direction: row; background-color: white; border-radius: 0 0 10px 10px; border: 1px solid #e5e7eb; border-top: none;">
-              <div style="flex: 1; padding: 20px;">
-                <div style="display: flex; margin-bottom: 20px;">
-                  <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(to right, #60a5fa, #a78bfa); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px; border: 4px solid #f3e8ff; margin-right: 15px;">
-                    ${ticketData.name.charAt(0)}
-                  </div>
-                  <div>
-                    <h3 style="margin: 0 0 5px; font-size: 18px;">${ticketData.name}</h3>
-                    <p style="margin: 0 0 3px; color: #4b5563;">${ticketData.profession}</p>
-                    <p style="margin: 0; font-size: 14px; color: #6b7280;">${ticketData.email}</p>
-                  </div>
-                </div>
-                
-                <div style="margin-bottom: 15px;">
-                  <p style="margin: 0 0 5px; font-size: 14px; color: #6b7280;">Meslek</p>
-                  <p style="margin: 0; font-weight: 500;">${ticketData.profession}</p>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                  <p style="margin: 0 0 5px; font-size: 14px; color: #6b7280;">Etkinlik Gunleri</p>
-                  <div>
-                    ${ticketData.days.map(day => `
-                      <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                        <span style="color: #10b981; margin-right: 8px;">✓</span>
-                        <span>${day}</span>
-                      </div>
-                    `).join('')}
-                  </div>
-                </div>
-                
-                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #f3f4f6;">
-                  <p style="margin: 0 0 10px; font-size: 14px; color: #6b7280;">Etkinlik Yeri</p>
-                  <div style="display: flex;">
-                    <div style="margin-right: 10px; color: #9ca3af;">📍</div>
-                    <div>
-                      <p style="margin: 0 0 3px; font-weight: 500;">Teknoloji Merkezi</p>
-                      <p style="margin: 0 0 3px; color: #4b5563;">Ankara, Turkiye</p>
-                      <p style="margin: 0; font-size: 14px; color: #6b7280;">Kongre Salonu, Kat 3</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div style="padding: 20px; background-color: #f9fafb; display: flex; flex-direction: column; align-items: center; border-left: 1px solid #e5e7eb;">
-                <div style="background-color: white; padding: 10px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 15px;">
-                  <img 
-                    src="${qrCodeUrl}" 
-                    alt="QR Code"
-                    style="width: 120px; height: 120px;"
-                  />
-                </div>
-                <p style="font-size: 12px; color: #6b7280; text-align: center; max-width: 150px;">
-                  Bu QR kodu etkinlige giris icin tarattiriniz
-                </p>
-              </div>
-            </div>
-            
-            <div style="background-color: #f9fafb; padding: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px; text-align: center;">
-              <p style="margin: 0; font-size: 14px; color: #6b7280;">
-                <span style="font-weight: 500; color: #4b5563;">22-24 Kasim 2025</span> • Kapi Acilis: 08:30
-              </p>
-            </div>
-          </div>
-        `;
-        
-        // Basit HTML'i bir div içine yerleştir
-        tempDiv = document.createElement('div');
-        tempDiv.innerHTML = simplifiedHTML;
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.left = '-9999px';
-        tempDiv.style.top = '-9999px';
-        document.body.appendChild(tempDiv);
-        
-        // QR kodun yüklenmesini bekle
-        const qrImage = tempDiv.querySelector('img');
-        if (qrImage) {
-          await new Promise((resolve) => {
-            qrImage.onload = resolve;
-            qrImage.onerror = resolve; // Hata durumunda da devam et
-          });
-        }
-        
-        // PDF Oluşturma Seçenekleri
-        const opt = {
-          margin: 10,
-          filename: `CodeFusion2025-Bilet-${data.id}.pdf`,
-          image: { type: 'jpeg', quality: 0.95 },
-          html2canvas: { 
-            scale: 2,
-            useCORS: true, // CORS'u etkinleştir
-            logging: false,
-            allowTaint: true // Dış kaynaklara izin ver
-          },
-          jsPDF: { 
-            unit: 'mm', 
-            format: 'a4', 
-            orientation: 'portrait'
-          }
-        };
-        
-        // Basit zaman aşımı
-        let pdfCompleted = false;
-        
-        // PDF işleminin kendisi
-        const pdfPromise = html2pdf().from(tempDiv).set(opt).save().then(() => {
-          pdfCompleted = true;
-          console.log('PDF başarıyla oluşturuldu');
-        });
-        
-        // Zaman aşımı kontrolü
-        const timeoutPromise = new Promise((_resolve, reject) => {
-          setTimeout(() => {
-            if (!pdfCompleted) {
-              reject(new Error('PDF oluşturma zaman aşımına uğradı'));
-            }
-          }, 10000); // Zaman aşımı süresini artırdık
-        });
-        
-        await Promise.race([pdfPromise, timeoutPromise]);
-      } catch (error) {
-        console.error('HTML2PDF hatası:', error);
-        setUsingFallback(true);
-        throw error;
-      } finally {
-        // HTML2PDF'in her durumda DOM'dan temizlenmesi
-        setTimeout(() => {
-          if (tempDiv) {
-            cleanupDOM();
-          }
-        }, 500);
-      }
+
+      await html2pdf().set(opt).from(ticketRef.current).save();
     } catch (error) {
       console.error('PDF oluşturma hatası:', error);
-      
-      if (!usingFallback) {
-        setUsingFallback(true);
-        // Kullanıcıya seçenek sunalım
-        try {
-          const userChoice = window.confirm(
-            'PDF oluşturulurken bir sorun oluştu. Bilet bilgilerinizi metin dosyası olarak indirmek ister misiniz?'
-          );
-          
-          if (userChoice) {
-            handleFallbackDownload();
-          }
-        } catch (confirmError) {
-          console.error('Kullanıcı onay hatası:', confirmError);
-          // Onay alınamadıysa otomatik olarak metin indirmeyi deneyelim
-          handleFallbackDownload();
-        }
-      } else {
-        alert('Bilet indirmede sorun oluştu. Lütfen daha sonra tekrar deneyin.');
-      }
+      setUsingFallback(true);
+      handleFallbackDownload();
     } finally {
-      // Her durumda düğmeyi serbest bırak
       setDownloadingPdf(false);
-      // PDF işlemi tamamlandıktan sonra yedek seçeneği sıfırlayalım
-      setTimeout(() => setUsingFallback(false), 500);
-      
-      // Sayfanın kilitlenmemesi için tarayıcıyı yenilemeyi önermek için son bir kontrol
-      if (tempDiv && document.body.contains(tempDiv)) {
-        try {
-          document.body.removeChild(tempDiv);
-        } catch (finalError) {
-          console.error('Son temizlik hatası:', finalError);
-        }
-      }
     }
   };
 
