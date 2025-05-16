@@ -8,13 +8,10 @@ import { AppBar, Toolbar, Typography, Box, Container } from '@mui/material';
 export default function Header() {
   return (
     <AppBar 
-      position="static" 
-      elevation={0}
+      position="fixed" 
       sx={{ 
-        background: 'transparent', 
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(10px)',
-        padding: '0.5rem 0'
+        backgroundColor: '#1f2937',
+        borderBottom: '1px solid #4b5563'
       }}
     >
       <Container maxWidth="lg">

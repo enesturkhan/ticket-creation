@@ -40,6 +40,7 @@ export default function FormSection() {
   const [fileError, setFileError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Form hook'u yapılandırması
   const {
@@ -111,7 +112,7 @@ export default function FormSection() {
   }
 
   return (
-    <div className="max-w-xl mx-auto bg-[rgba(31,41,55,0.7)] backdrop-blur-sm p-6 rounded-lg shadow-lg border border-[#374151]">
+    <div className="max-w-xl mx-auto bg-[#1f2937] backdrop-blur-sm p-6 rounded-lg shadow-lg border border-[#374151]">
       <div className="mb-8 text-center">
         <h3 className="text-xl font-bold text-white mb-2">
           CodeFusion 2025 Kayıt Formu
@@ -122,14 +123,34 @@ export default function FormSection() {
       </div>
 
       {submitSuccess && !submitted && (
-        <div className="bg-[rgba(74,222,128,0.2)] border border-[rgba(34,197,94,0.3)] text-[#dcfce7] px-4 py-3 rounded mb-4 flex items-center justify-between">
+        <div className="bg-[#dcfce7] border border-[#86efac] text-[#166534] px-4 py-3 rounded mb-4 flex items-center justify-between">
           <div className="flex items-center">
             <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
             </svg>
             <p>Form başarıyla gönderildi! Biletiniz hazırlanıyor...</p>
           </div>
-          <div className="animate-spin h-5 w-5 border-2 border-green-100 rounded-full border-t-transparent"></div>
+          <div className="animate-spin h-5 w-5 border-2 border-[#dcfce7] rounded-full border-t-transparent"></div>
+        </div>
+      )}
+
+      {error && (
+        <div className="bg-[#dcfce7] border border-[#86efac] text-[#166534] px-4 py-3 rounded mb-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setError(null)}
+            className="text-[#166534] hover:text-[#15803d] focus:outline-none"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       )}
 
@@ -231,14 +252,14 @@ export default function FormSection() {
             disabled={isSubmitting}
             className={`w-full py-3 px-4 ${
               isSubmitting 
-                ? 'bg-blue-400 cursor-not-allowed' 
-                : 'bg-blue-500 hover:bg-blue-600'
-            } text-white font-medium rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center shadow-md`}
+                ? 'bg-[#60a5fa] cursor-not-allowed' 
+                : 'bg-[#3b82f6] hover:bg-[#2563eb]'
+            } text-[#ffffff] font-medium rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:ring-offset-2 flex items-center justify-center shadow-md`}
             aria-label="Kaydınızı tamamlayın"
           >
             {isSubmitting ? (
               <>
-                <span className="animate-spin h-5 w-5 mr-2 border-2 border-white rounded-full border-t-transparent"></span>
+                <span className="animate-spin h-5 w-5 mr-2 border-2 border-[#ffffff] rounded-full border-t-transparent"></span>
                 Gönderiliyor...
               </>
             ) : 'Kaydımı Oluştur'}

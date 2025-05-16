@@ -209,11 +209,11 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
 
   return (
     <div className="max-w-xl mx-auto">
-      <div className="bg-[rgba(255,255,255,0.2)] backdrop-blur-sm p-8 rounded-lg border border-[rgba(255,255,255,0.3)] mb-8 shadow-lg">
+      <div className="bg-[#ffffff] backdrop-blur-sm p-8 rounded-lg border border-[#e5e7eb] mb-8 shadow-lg">
         <div className="text-center mb-8">
-          <div className="bg-[rgba(255,255,255,0.2)] p-2 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+          <div className="bg-[#ffffff] p-2 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
             <svg 
-              className="w-10 h-10 text-green-400" 
+              className="w-10 h-10 text-[#34d399]" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
@@ -226,15 +226,15 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">
+          <h1 className="text-2xl font-bold text-[#000000] mb-2">
             Kayit Basarili!
           </h1>
-          <p className="text-[rgba(255,255,255,0.8)] mb-8">
+          <p className="text-[#4b5563] mb-8">
             CodeFusion 2025 etkinligine katiliminiz onaylandi. Bilet detaylariniz asagidadir.
           </p>
 
           {emailSent ? (
-            <div className="bg-[rgba(74,222,128,0.2)] border border-[rgba(34,197,94,0.3)] text-[#dcfce7] px-4 py-3 rounded mb-6 flex items-center">
+            <div className="bg-[#dcfce7] border border-[#86efac] text-[#166534] px-4 py-3 rounded mb-6 flex items-center">
               <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
@@ -244,11 +244,11 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
             <button 
               onClick={handleSendEmail}
               disabled={sending}
-              className={`mb-6 inline-flex items-center justify-center px-4 py-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors shadow-md ${sending ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className={`mb-6 inline-flex items-center justify-center px-4 py-2 rounded-full bg-[#3b82f6] text-[#ffffff] hover:bg-[#2563eb] transition-colors shadow-md ${sending ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {sending ? (
                 <>
-                  <span className="animate-spin h-4 w-4 mr-2 border-2 border-white rounded-full border-t-transparent"></span>
+                  <span className="animate-spin h-4 w-4 mr-2 border-2 border-[#ffffff] rounded-full border-t-transparent"></span>
                   Gonderiliyor...
                 </>
               ) : (
@@ -263,14 +263,14 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
           )}
         </div>
 
-        <div ref={ticketRef} id="bilet-pdf" className="bg-white rounded-lg overflow-hidden shadow-lg mb-6">
+        <div ref={ticketRef} id="bilet-pdf" className="bg-[#ffffff] rounded-lg overflow-hidden shadow-lg mb-6">
           {/* Bilet Basligi */}
-          <div className="bg-gradient-to-r from-[#2563eb] to-[#9333ea] py-4 px-6 flex justify-between items-center">
+          <div className="bg-[#2563eb] py-4 px-6 flex justify-between items-center">
             <div>
-              <h2 className="text-white font-bold text-lg">CodeFusion 2025</h2>
-              <p className="text-[rgba(255,255,255,0.8)] text-sm">Yazilim Gelistirici Konferansi</p>
+              <h2 className="text-[#ffffff] font-bold text-lg">CodeFusion 2025</h2>
+              <p className="text-[#e5e7eb] text-sm">Yazilim Gelistirici Konferansi</p>
             </div>
-            <div className="text-white text-sm text-right">
+            <div className="text-[#ffffff] text-sm text-right">
               <p>Bilet No: {data.id}</p>
               <p>{data.date}</p>
             </div>
@@ -282,7 +282,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
             <div className="p-6 flex-1">
               <div className="flex items-start gap-4 mb-6">
                 {data.avatar ? (
-                  <div className="relative h-16 w-16 overflow-hidden rounded-full border-4 border-purple-100">
+                  <div className="relative h-16 w-16 overflow-hidden rounded-full border-4 border-[#f3e8ff]">
                     <Image
                       src={data.avatar}
                       alt={data.name}
@@ -292,55 +292,55 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
                     />
                   </div>
                 ) : (
-                  <div className="h-16 w-16 rounded-full bg-gradient-to-r from-[#60a5fa] to-[#a855f7] flex items-center justify-center text-white font-bold text-xl border-4 border-[#f3e8ff]">
+                  <div className="h-16 w-16 rounded-full bg-[#3b82f6] flex items-center justify-center text-[#ffffff] font-bold text-xl border-4 border-[#f3e8ff]">
                     {data.name.charAt(0)}
                   </div>
                 )}
                 <div>
-                  <h3 className="font-bold text-gray-800 text-xl">{data.name}</h3>
-                  <p className="text-gray-600">{data.profession}</p>
-                  <p className="text-gray-500 text-sm">{data.email}</p>
+                  <h3 className="font-bold text-[#1f2937] text-xl">{data.name}</h3>
+                  <p className="text-[#4b5563]">{data.profession}</p>
+                  <p className="text-[#6b7280] text-sm">{data.email}</p>
                 </div>
               </div>
 
               <div className="mb-4">
-                <p className="text-sm text-gray-500 mb-1">Meslek</p>
-                <p className="font-medium text-gray-800">{data.profession}</p>
+                <p className="text-sm text-[#6b7280] mb-1">Meslek</p>
+                <p className="font-medium text-[#1f2937]">{data.profession}</p>
               </div>
 
               <div>
-                <p className="text-sm text-gray-500 mb-1">Etkinlik Gunleri</p>
+                <p className="text-sm text-[#6b7280] mb-1">Etkinlik Gunleri</p>
                 <div className="space-y-1">
                   {data.days.map((day) => (
                     <div key={day} className="flex items-center gap-2">
-                      <svg className="h-4 w-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-4 w-4 text-[#34d399]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <p className="text-gray-700">{getDayLabel(day)}</p>
+                      <p className="text-[#374151]">{getDayLabel(day)}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="mt-6 pt-6 border-t border-gray-100">
-                <p className="text-sm text-gray-500 mb-3">Etkinlik Yeri</p>
+              <div className="mt-6 pt-6 border-t border-[#e5e7eb]">
+                <p className="text-sm text-[#6b7280] mb-3">Etkinlik Yeri</p>
                 <div className="flex items-start gap-2">
-                  <svg className="h-5 w-5 text-gray-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5 text-[#9ca3af] mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   <div>
-                    <p className="font-medium text-gray-800">Teknoloji Merkezi</p>
-                    <p className="text-gray-600">Ankara, Turkiye</p>
-                    <p className="text-gray-500 text-sm">Kongre Salonu, Kat 3</p>
+                    <p className="font-medium text-[#1f2937]">Teknoloji Merkezi</p>
+                    <p className="text-[#4b5563]">Ankara, Turkiye</p>
+                    <p className="text-[#6b7280] text-sm">Kongre Salonu, Kat 3</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* QR Kodu */}
-            <div className="bg-gray-50 p-6 flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-gray-200">
-              <div className="mb-4 bg-white p-2 rounded-lg shadow-md">
+            <div className="bg-[#f9fafb] p-6 flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-[#e5e7eb]">
+              <div className="mb-4 bg-[#ffffff] p-2 rounded-lg shadow-md">
                 <img 
                   src={qrCodeUrl} 
                   alt="QR Code"
@@ -349,16 +349,16 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
                   className="rounded-md"
                 />
               </div>
-              <p className="text-xs text-center text-gray-500 max-w-[150px]">
+              <p className="text-xs text-center text-[#6b7280] max-w-[150px]">
                 Bu QR kodu etkinlige giris icin tarattiriniz
               </p>
             </div>
           </div>
           
           {/* Bilet Alt Bilgisi */}
-          <div className="bg-gray-50 p-4 border-t border-gray-200 text-center">
-            <p className="text-sm text-gray-500">
-              <span className="font-medium text-gray-700">22-24 Kasim 2025</span> • Kapi Acilis: 08:30
+          <div className="bg-[#f9fafb] p-4 border-t border-[#e5e7eb] text-center">
+            <p className="text-sm text-[#6b7280]">
+              <span className="font-medium text-[#374151]">22-24 Kasim 2025</span> • Kapi Acilis: 08:30
             </p>
           </div>
         </div>
@@ -368,12 +368,12 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
             onClick={handleDownloadPdf}
             disabled={downloadingPdf}
             className={`flex-1 py-2 px-4 rounded-full ${
-              downloadingPdf ? 'bg-gray-500 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700'
-            } text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 flex items-center justify-center shadow-md`}
+              downloadingPdf ? 'bg-[#6b7280] cursor-not-allowed' : 'bg-[#7c3aed] hover:bg-[#6d28d9]'
+            } text-[#ffffff] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#7c3aed] focus:ring-offset-2 flex items-center justify-center shadow-md`}
           >
             {downloadingPdf ? (
               <>
-                <span className="animate-spin h-4 w-4 mr-2 border-2 border-white rounded-full border-t-transparent"></span>
+                <span className="animate-spin h-4 w-4 mr-2 border-2 border-[#ffffff] rounded-full border-t-transparent"></span>
                 Hazirlaniyor...
               </>
             ) : (
@@ -388,7 +388,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
 
           <button
             onClick={handleShare}
-            className="flex-1 py-2 px-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center shadow-md"
+            className="flex-1 py-2 px-4 rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] text-[#ffffff] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 flex items-center justify-center shadow-md"
           >
             <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -400,7 +400,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
       
       <div className="flex justify-center mb-8">
         <Link 
-          className="inline-flex items-center py-2 px-4 text-indigo-100 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="inline-flex items-center py-2 px-4 text-[#e0e7ff] hover:text-[#ffffff] transition-colors focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:ring-offset-2"
           href="/"
         >
           <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
