@@ -153,9 +153,9 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
 
   return (
     <div className="max-w-xl mx-auto">
-      <div className="bg-white/20 backdrop-blur-sm p-8 rounded-lg border border-white/30 mb-8 shadow-lg">
+      <div className="bg-[rgba(255,255,255,0.2)] backdrop-blur-sm p-8 rounded-lg border border-[rgba(255,255,255,0.3)] mb-8 shadow-lg">
         <div className="text-center mb-8">
-          <div className="bg-white/20 p-2 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+          <div className="bg-[rgba(255,255,255,0.2)] p-2 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
             <svg 
               className="w-10 h-10 text-green-400" 
               fill="none" 
@@ -173,12 +173,12 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
           <h1 className="text-2xl font-bold text-white mb-2">
             Kayit Basarili!
           </h1>
-          <p className="text-white/80 mb-8">
+          <p className="text-[rgba(255,255,255,0.8)] mb-8">
             CodeFusion 2025 etkinligine katiliminiz onaylandi. Bilet detaylariniz asagidadir.
           </p>
 
           {emailSent ? (
-            <div className="bg-green-400/20 border border-green-500/30 text-green-100 px-4 py-3 rounded mb-6 flex items-center">
+            <div className="bg-[rgba(74,222,128,0.2)] border border-[rgba(34,197,94,0.3)] text-[#dcfce7] px-4 py-3 rounded mb-6 flex items-center">
               <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
@@ -209,10 +209,10 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
 
         <div ref={ticketRef} id="bilet-pdf" className="bg-white rounded-lg overflow-hidden shadow-lg mb-6">
           {/* Bilet Basligi */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-4 px-6 flex justify-between items-center">
+          <div className="bg-gradient-to-r from-[#2563eb] to-[#9333ea] py-4 px-6 flex justify-between items-center">
             <div>
               <h2 className="text-white font-bold text-lg">CodeFusion 2025</h2>
-              <p className="text-white/80 text-sm">Yazilim Gelistirici Konferansi</p>
+              <p className="text-[rgba(255,255,255,0.8)] text-sm">Yazilim Gelistirici Konferansi</p>
             </div>
             <div className="text-white text-sm text-right">
               <p>Bilet No: {data.id}</p>
@@ -236,7 +236,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
                     />
                   </div>
                 ) : (
-                  <div className="h-16 w-16 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold text-xl border-4 border-purple-100">
+                  <div className="h-16 w-16 rounded-full bg-gradient-to-r from-[#60a5fa] to-[#a855f7] flex items-center justify-center text-white font-bold text-xl border-4 border-[#f3e8ff]">
                     {data.name.charAt(0)}
                   </div>
                 )}

@@ -111,7 +111,7 @@ export default function FormSection() {
   }
 
   return (
-    <div className="max-w-xl mx-auto bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-700">
+    <div className="max-w-xl mx-auto bg-[rgba(31,41,55,0.7)] backdrop-blur-sm p-6 rounded-lg shadow-lg border border-[#374151]">
       <div className="mb-8 text-center">
         <h3 className="text-xl font-bold text-white mb-2">
           CodeFusion 2025 Kayıt Formu
@@ -122,7 +122,7 @@ export default function FormSection() {
       </div>
 
       {submitSuccess && !submitted && (
-        <div className="bg-green-400/20 border border-green-500/30 text-green-100 px-4 py-3 rounded mb-4 flex items-center justify-between">
+        <div className="bg-[rgba(74,222,128,0.2)] border border-[rgba(34,197,94,0.3)] text-[#dcfce7] px-4 py-3 rounded mb-4 flex items-center justify-between">
           <div className="flex items-center">
             <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
