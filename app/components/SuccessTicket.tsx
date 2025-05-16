@@ -95,32 +95,65 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
           // Klonlanmış dokümanda elementin görünür olduğundan emin ol
           const clonedElement = clonedDoc.getElementById('bilet-pdf');
           if (clonedElement) {
-            clonedElement.style.display = 'block';
-            clonedElement.style.visibility = 'visible';
-            clonedElement.style.opacity = '1';
-            
-            // Tüm gradient ve rgba renkleri düz renklere dönüştür
+            // Önce tüm stilleri temizle
+            const styleSheets = Array.from(clonedDoc.styleSheets);
+            styleSheets.forEach(sheet => {
+              try {
+                const rules = Array.from(sheet.cssRules);
+                rules.forEach(rule => {
+                  if (rule instanceof CSSStyleRule) {
+                    rule.style.cssText = rule.style.cssText
+                      .replace(/oklch\([^)]+\)/g, '#000000')
+                      .replace(/rgba?\([^)]+\)/g, '#000000')
+                      .replace(/hsla?\([^)]+\)/g, '#000000');
+                  }
+                });
+              } catch (e) {
+                console.warn('Style sheet erişim hatası:', e);
+              }
+            });
+
+            // Sonra inline stilleri düzelt
             const elements = clonedElement.getElementsByTagName('*');
             for (let i = 0; i < elements.length; i++) {
               const el = elements[i] as HTMLElement;
               const style = window.getComputedStyle(el);
               
-              // Gradient arka planları düz renge dönüştür
-              if (style.backgroundImage && style.backgroundImage !== 'none') {
-                if (style.backgroundImage.includes('gradient')) {
-                  el.style.backgroundImage = 'none';
-                  el.style.backgroundColor = '#2563eb'; // Varsayılan mavi renk
+              // Tüm renk özelliklerini kontrol et ve düzelt
+              const colorProperties = [
+                'color',
+                'backgroundColor',
+                'borderColor',
+                'borderTopColor',
+                'borderRightColor',
+                'borderBottomColor',
+                'borderLeftColor'
+              ] as const;
+
+              type ColorProperty = typeof colorProperties[number];
+
+              colorProperties.forEach(prop => {
+                const value = style.getPropertyValue(prop);
+                if (value && (
+                  value.includes('oklch') ||
+                  value.includes('rgba') ||
+                  value.includes('hsla')
+                )) {
+                  el.style[prop] = '#000000';
                 }
-              }
-              
-              // rgba renkleri hex'e dönüştür
-              if (style.color && style.color.includes('rgba')) {
-                el.style.color = '#000000';
-              }
-              if (style.backgroundColor && style.backgroundColor.includes('rgba')) {
-                el.style.backgroundColor = '#ffffff';
+              });
+
+              // Gradient arka planları düzelt
+              if (style.backgroundImage && style.backgroundImage !== 'none') {
+                el.style.backgroundImage = 'none';
+                el.style.backgroundColor = '#2563eb';
               }
             }
+
+            // Elementin görünürlüğünü ayarla
+            clonedElement.style.display = 'block';
+            clonedElement.style.visibility = 'visible';
+            clonedElement.style.opacity = '1';
           }
         }
       });
