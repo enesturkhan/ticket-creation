@@ -5,7 +5,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import InputField from './InputField';
-import SelectField from './SelectField';
 import CheckboxGroup from './CheckboxGroup';
 import FileUpload from './FileUpload';
 import SuccessTicket from './SuccessTicket';
@@ -17,7 +16,6 @@ const formSchema = z.object({
   email: z.string().email('Geçerli bir e-posta adresi giriniz.'),
   github: z.string().optional(),
   profession: z.string().min(2, 'Mesleğinizi giriniz.'),
-  participationType: z.string().min(1, 'Katılım türü seçiniz.'),
   days: z.array(z.string()).min(1, 'En az bir gün seçmelisiniz.'),
   avatar: z.instanceof(File).optional().nullable(),
 });
@@ -30,7 +28,6 @@ interface TicketData {
   name: string;
   email: string;
   profession: string;
-  type: string;
   days: string[];
   avatar: string | null | undefined;
   date: string;
@@ -59,12 +56,6 @@ export default function FormSection() {
   });
 
   // Form seçenekleri
-  const katilimTurleri = [
-    { value: 'izleyici', label: 'İzleyici' },
-    { value: 'konusmaci', label: 'Konuşmacı' },
-    { value: 'sponsor', label: 'Sponsor' },
-  ];
-
   const gunSecenekleri = [
     { value: 'gun1', label: '22 Kasım: Atölyeler' },
     { value: 'gun2', label: '23 Kasım: Konferanslar' },
@@ -85,7 +76,6 @@ export default function FormSection() {
         name: `${data.firstName} ${data.lastName}`,
         email: data.email,
         profession: data.profession,
-        type: data.participationType,
         days: data.days,
         avatar: data.avatar ? URL.createObjectURL(data.avatar) : null,
         date: new Date().toLocaleDateString(),
@@ -217,23 +207,6 @@ export default function FormSection() {
           required
           {...register('profession')}
           error={errors.profession?.message}
-        />
-
-        <Controller
-          name="participationType"
-          control={control}
-          render={({ field }) => (
-            <SelectField
-              id="participationType"
-              label="Katılım Türü"
-              options={katilimTurleri}
-              description="Konferansa nasıl katılmak istediğinizi seçin"
-              required
-              onChange={field.onChange}
-              value={field.value}
-              error={errors.participationType?.message}
-            />
-          )}
         />
 
         <Controller

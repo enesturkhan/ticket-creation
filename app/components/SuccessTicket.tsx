@@ -11,7 +11,6 @@ interface TicketData {
   name: string;
   email: string;
   profession: string;
-  type: string;
   days: string[];
   avatar: string | null | undefined;
   date: string;
@@ -170,8 +169,8 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
                 </div>
                 
                 <div style="margin-bottom: 15px;">
-                  <p style="margin: 0 0 5px; font-size: 14px; color: #6b7280;">Katilim Turu</p>
-                  <p style="margin: 0; font-weight: 500;">${ticketData.type}</p>
+                  <p style="margin: 0 0 5px; font-size: 14px; color: #6b7280;">Meslek</p>
+                  <p style="margin: 0; font-weight: 500;">${ticketData.profession}</p>
                 </div>
                 
                 <div style="margin-bottom: 20px;">
@@ -449,8 +448,8 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
               </div>
 
               <div className="mb-4">
-                <p className="text-sm text-gray-500 mb-1">Katilim Turu</p>
-                <p className="font-medium text-gray-800">{getTypeLabel(data.type)}</p>
+                <p className="text-sm text-gray-500 mb-1">Meslek</p>
+                <p className="font-medium text-gray-800">{data.profession}</p>
               </div>
 
               <div>
