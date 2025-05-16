@@ -132,14 +132,14 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
 
               type ColorProperty = typeof colorProperties[number];
 
-              colorProperties.forEach(prop => {
+              colorProperties.forEach((prop: ColorProperty) => {
                 const value = style.getPropertyValue(prop);
                 if (value && (
                   value.includes('oklch') ||
                   value.includes('rgba') ||
                   value.includes('hsla')
                 )) {
-                  el.style[prop] = '#000000';
+                  (el.style as Record<ColorProperty, string>)[prop] = '#000000';
                 }
               });
 
