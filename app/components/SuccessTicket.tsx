@@ -103,7 +103,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
                 rules.forEach(rule => {
                   if (rule instanceof CSSStyleRule) {
                     rule.style.cssText = rule.style.cssText
-                      .replace(/oklch\([^)]+\)/g, '#000000')
+                     
                       .replace(/rgba?\([^)]+\)/g, '#000000')
                       .replace(/hsla?\([^)]+\)/g, '#000000');
                   }
@@ -135,7 +135,7 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
               colorProperties.forEach((prop: ColorProperty) => {
                 const value = style.getPropertyValue(prop);
                 if (value && (
-                  value.includes('oklch') ||
+                 
                   value.includes('rgba') ||
                   value.includes('hsla')
                 )) {
