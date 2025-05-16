@@ -36,15 +36,6 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
     return dayLabels[day] || day;
   };
 
-  const getTypeLabel = (type: string): string => {
-    const typeLabels: Record<string, string> = {
-      'izleyici': 'Izleyici',
-      'konusmaci': 'Konusmaci',
-      'sponsor': 'Sponsor',
-    };
-    return typeLabels[type] || type;
-  };
-
   // Simule edilmis e-posta gonderimi
   const handleSendEmail = async () => {
     setSending(true);
@@ -72,7 +63,6 @@ KATILIMCI BILGILERI:
 Ad Soyad: ${data.name}
 E-posta: ${data.email}
 Meslek: ${data.profession}
-Katılım Türü: ${getTypeLabel(data.type)}
 
 KATILIM GUNLERI:
 ${data.days.map(day => '- ' + getDayLabel(day)).join('\n')}
@@ -116,7 +106,6 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
         name: data.name,
         email: data.email,
         profession: data.profession,
-        type: getTypeLabel(data.type),
         days: data.days.map(day => getDayLabel(day)),
         date: data.date
       };
