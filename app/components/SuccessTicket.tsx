@@ -3,7 +3,8 @@
 import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-// We'll dynamically import html2pdf.js on the client side only
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 // Bilet icin verilerimizin tipini tanimliyoruz
 interface TicketData {
@@ -24,7 +25,6 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
   const [emailSent, setEmailSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
-  const [usingFallback, setUsingFallback] = useState(false);
   const ticketRef = useRef<HTMLDivElement>(null);
 
   const getDayLabel = (day: string): string => {
@@ -41,7 +41,6 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
     setSending(true);
     
     try {
-      // Gercek e-posta gonderimi yerine bir gecikme ekleyerek simule ediyoruz
       await new Promise(resolve => setTimeout(resolve, 2000));
       setEmailSent(true);
     } catch (error) {
@@ -49,41 +48,6 @@ export default function SuccessTicket({ data }: SuccessTicketProps) {
     } finally {
       setSending(false);
     }
-  };
-  
-  // Yedek çözüm - Basit bir text dosyası indir
-  const handleFallbackDownload = () => {
-    const ticketText = `
-=== CODEFUSION 2025 ETKINLIK BILETI ===
-
-BILET NO: ${data.id}
-TARIH: ${data.date}
-
-KATILIMCI BILGILERI:
-Ad Soyad: ${data.name}
-E-posta: ${data.email}
-Meslek: ${data.profession}
-
-KATILIM GUNLERI:
-${data.days.map(day => '- ' + getDayLabel(day)).join('\n')}
-
-ETKINLIK YERI:
-Teknoloji Merkezi
-Ankara, Turkiye
-Kongre Salonu, Kat 3
-
-Kapı Açılış: 08:30
-
-Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
-    `;
-
-    const element = document.createElement('a');
-    const file = new Blob([ticketText], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = `CodeFusion2025-Bilet-${data.id}.txt`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
   };
 
   // PDF olarak indirme
@@ -93,33 +57,52 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
     setDownloadingPdf(true);
     
     try {
-      const html2pdfModule = await import('html2pdf.js');
-      const html2pdf = html2pdfModule.default;
-      
-      const opt = {
-        margin: 0.5,
-        filename: `CodeFusion2025-Bilet-${data.id}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-      };
+      // QR kodun yüklenmesini bekle
+      const qrImage = ticketRef.current.querySelector('img');
+      if (qrImage) {
+        await new Promise((resolve) => {
+          qrImage.onload = resolve;
+          qrImage.onerror = resolve;
+        });
+      }
 
-      await html2pdf().set(opt).from(ticketRef.current).save();
+      // HTML'i canvas'a çevir
+      const canvas = await html2canvas(ticketRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        allowTaint: true
+      });
+
+      // Canvas'ı PNG'ye çevir
+      const imgData = canvas.toDataURL('image/png');
+
+      // PDF oluştur
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      });
+
+      // Görüntüyü PDF'e ekle
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+
+      // PDF'i indir
+      pdf.save(`CodeFusion2025-Bilet-${data.id}.pdf`);
+
     } catch (error) {
       console.error('PDF oluşturma hatası:', error);
-      setUsingFallback(true);
-      handleFallbackDownload();
+      alert('PDF oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
     } finally {
       setDownloadingPdf(false);
     }
   };
 
-  // QR Kodu icin rastgele veriler olusturuyoruz (gercekte bilet ID'si kullanilabilir)
+  // QR Kodu icin rastgele veriler olusturuyoruz
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=CODEFUSION2025-${data.id}-${encodeURIComponent(data.email)}`;
 
   // Sosyal medyada paylasma fonksiyonu
   const handleShare = async () => {
-    // Make sure we're in a browser environment
     if (typeof window === 'undefined' || !navigator) {
       console.error('Sharing can only be performed in a browser environment');
       return;
@@ -196,7 +179,7 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
           )}
         </div>
 
-        <div ref={ticketRef} className="bg-white rounded-lg overflow-hidden shadow-lg mb-6">
+        <div ref={ticketRef} id="bilet-pdf" className="bg-white rounded-lg overflow-hidden shadow-lg mb-6">
           {/* Bilet Basligi */}
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-4 px-6 flex justify-between items-center">
             <div>
@@ -314,7 +297,7 @@ Etkinliğe girerken lütfen bu bileti ve kimliğinizi yanınızda bulundurunuz.
                 <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                {usingFallback ? 'Metin Olarak İndir' : 'PDF Olarak İndir'}
+                PDF Olarak İndir
               </>
             )}
           </button>
