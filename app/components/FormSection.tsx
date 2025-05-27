@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import emailjs from '@emailjs/browser';
+import { EMAILJS_CONFIG } from '../config/emailjs';
 import InputField from './InputField';
 import CheckboxGroup from './CheckboxGroup';
 import FileUpload from './FileUpload';
@@ -66,11 +68,33 @@ export default function FormSection() {
   // Form gönderim işlemi
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
+    setError(null);
     
     try {
-      // API simülasyonu
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
+      // EmailJS ile e-posta gönderimi
+      await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        {
+          to_email: EMAILJS_CONFIG.TO_EMAIL,
+          from_name: `${data.firstName} ${data.lastName}`,
+          from_email: data.email,
+          profession: data.profession,
+          github: data.github || 'Belirtilmedi',
+          days: data.days.join(', '),
+          message: `
+            Yeni Kayıt Bilgileri:
+            Ad: ${data.firstName}
+            Soyad: ${data.lastName}
+            E-posta: ${data.email}
+            GitHub: ${data.github || 'Belirtilmedi'}
+            Meslek: ${data.profession}
+            Katılım Günleri: ${data.days.join(', ')}
+          `
+        },
+        EMAILJS_CONFIG.PUBLIC_KEY
+      );
+
       // Bilet verisi oluşturma
       const ticket: TicketData = {
         id: `DEV-${Math.floor(Math.random() * 10000)}`,
@@ -91,6 +115,7 @@ export default function FormSection() {
       }, 500);
     } catch (error) {
       console.error('Form gönderim hatası:', error);
+      setError('Form gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
       setSubmitSuccess(false);
     } finally {
       setIsSubmitting(false);
