@@ -91,8 +91,7 @@ export default function FormSection() {
             Meslek: ${data.profession}
             Katılım Günleri: ${data.days.join(', ')}
           `
-        },
-        EMAILJS_CONFIG.PUBLIC_KEY
+        }
       );
 
       // Bilet verisi oluşturma
